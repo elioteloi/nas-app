@@ -59,7 +59,24 @@ const userApi = () => {
   }
 }
 
-return { createUser, fetchUser, updateUser };
+const deleteUser = async (id) => {
+  console.log("id delete", id);
+  
+  try {
+  const response = await fetch(`http:/${Config.API_IP_ADDRESS}:3000/deleteUser/${id}`, {
+    method: "DELETE",
+    headers: {
+      'Content-Type': 'application/json',
+    }, 
+  })
+
+  return await response.json();
+  } catch (error) {
+  console.error('Error updating user:', error);
+  throw error;
+  }
+}
+return { createUser, fetchUser, updateUser, deleteUser };
 };
 
 
