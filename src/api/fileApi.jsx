@@ -34,7 +34,30 @@ const fetchFile = async (id, folder) => {
   }
 };
 
-  return { createFile, fetchFile };
+
+  const updateFile = async (id, name) => {
+    console.log("update", id, name);
+    
+    try {
+      const response = await fetch(`http://${Config.API_IP_ADDRESS}:3000/updateFile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: id,
+          name: name
+        })
+      })
+  
+      return await response.json();
+    } catch (error) {
+      console.error('Error updating file:', error);
+      throw error;
+    }
+  }
+
+  return { createFile, fetchFile, updateFile };
 };
 
 
