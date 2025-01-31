@@ -43,7 +43,30 @@ const folderApi = () => {
 
     }
 
-    return { createFolder, fetchFolder }
+    const updateFolder = async (idFolder, folder) => {
+        
+        try {
+        const response = await fetch(`http://${Config.API_IP_ADDRESS}:3000/updateFolder`, {
+             method: 'put',
+             headers: {
+                'Content-Type': 'application/json',
+             },
+             body: JSON.stringify({
+                id: idFolder,
+                folderName: folder
+            })
+        })
+      
+          return await response.json();
+    } catch (error) {
+        console.error('Error fetching folder:', error);
+        throw error; 
+    }
+
+    
+}
+
+    return { createFolder, fetchFolder, updateFolder }
 }
 export default folderApi
 
