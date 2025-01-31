@@ -20,7 +20,25 @@ const userApi = () => {
   }
 }
 
-return { createUser };
+
+  const fetchUser = async (email, password) => {
+    try {
+    const response = await fetch(`http://${Config.API_IP_ADDRESS}:3000/fetchUser`, {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+        });
+    
+        return await response.json();
+  } catch (error) {
+      console.error('Error fetching user:', error);
+      throw error;
+    }  
+  };
+
+return { createUser, fetchUser };
 };
 
 
