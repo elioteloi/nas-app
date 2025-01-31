@@ -57,7 +57,26 @@ const fetchFile = async (id, folder) => {
     }
   }
 
-  return { createFile, fetchFile, updateFile };
+  const deleteFile = async (id) => {
+    try {
+      
+      const response = await fetch(`http://${Config.API_IP_ADDRESS}:3000/deleteFile/${id}`, {
+        method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+        },
+      })
+  
+      return await response.json();
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      throw error;
+    }
+   
+  }
+
+
+  return { createFile, fetchFile, updateFile, deleteFile };
 };
 
 
