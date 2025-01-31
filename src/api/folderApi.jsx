@@ -66,7 +66,23 @@ const folderApi = () => {
     
 }
 
-    return { createFolder, fetchFolder, updateFolder }
+    const deleteFolder = async (id) => {        
+        try {
+        const response = await fetch(`http://${Config.API_IP_ADDRESS}:3000/deleteFolder/${id}`, {
+        method: 'delete',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+
+      return await response.json();
+    } catch (error) {
+        console.error('Error fetching folder:', error);
+        throw error; 
+    }
+    
+}
+    return { createFolder, fetchFolder, updateFolder, deleteFolder }
 }
 export default folderApi
 
