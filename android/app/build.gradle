@@ -99,20 +99,18 @@ android {
             keyPassword 'android'
         }
     }
-    buildTypes {
-        debug {
-            signingConfig signingConfigs.release
-        }
-        release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-        }
+ buildTypes {
+    debug {
+        signingConfig signingConfigs.debug
+    }
+    release {
+        signingConfig signingConfigs.release
+        minifyEnabled enableProguardInReleaseBuilds
+        proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
     }
 }
 
+}
 dependencies {
         implementation 'androidx.multidex:multidex:2.0.1' // Latest version of Multidex
     // The version of react-native is set by the React Native Gradle Plugin
