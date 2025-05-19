@@ -38,7 +38,7 @@ cd nas-app
 npm install
 ```
 
-### 3. Create a .env file to connect to your database and put the path where you want your NAS folder and files to be located and stored
+### 3. Create a .env file to connect to your backend server
 
 ```bash
 # IP address or hostname of the server to connect to the network
