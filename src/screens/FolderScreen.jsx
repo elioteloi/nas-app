@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useNavigation } from '@react-navigation/native';
-import { Image, Text, View, TouchableOpacity, RefreshControl } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { View } from "react-native";
 import Button from "../components/Button";
-import ButtonPickerFile from "../components/ButtonPickerFile";
-import ModalComponent from "../components/Modal";
-import Input from "../components/Input";
 import fileApi from "../api/fileApi";
 import AuthContext from "../context/AuthContext";
 import FileList from "../components/FileList";
+import {launchImageLibrary} from 'react-native-image-picker';
+import Loading from "../components/Loading";
 
 const FolderScreen = ({ route }) => {
 
@@ -16,41 +13,97 @@ const FolderScreen = ({ route }) => {
 
   const [data, setData] = useState([])
   const [errorBackend, setErrorBackend] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  const {fetchFile, updateFile, deleteFile} = fileApi()
+  const {createFile, fetchFile, updateFile, deleteFile} = fileApi()
 
 
   const {folder} = route.params
 
+  const fetchFileHandler = async () => {
+    try {
+     
+      const json = await fetchFile(id, folder);
+      setData(json.result)
+      
+    } catch (error) {
+      console.error('Error in fetchID');
+    }
+  };
+
 
   useEffect(() => {
     
-    const fetchID = async () => {
-      try {
-       
-        const json = await fetchFile(id, folder);
-        setData(json.result)
-      } catch (error) {
-        console.error('Error in fetchID');
-      }
-    };
-  
-    fetchID();
+    fetchFileHandler();
   }, [folder]);
 
-``
+
+const uploadFilesOnPressHandler = async () => {
+  
+  const options = {
+    mediaType: 'photo',
+    quality: 1,
+    selectionLimit: 0,
+    includeBase64: false,
+    maxHeight: 2000,
+    maxWidth: 2000,
+  };
+
+  try {
+    const response = await launchImageLibrary(options);
+
+    if (response.didCancel) {
+      console.log('User cancelled image picker');
+      
+      return;
+    }
+    if (response.errorCode) {
+      console.log('Image picker error:', response.errorMessage);
+      return;
+    }
+
+    for (const element of response.assets) {
+      const formData = new FormData();
+      formData.append("photos", {
+        uri: element.uri,
+        type: element.type,
+        name: element.fileName,
+      });
+      formData.append("ID", id);
+      formData.append("folder", folder);
+
+      await createFile(formData);
+    }
+  } catch (err) {
+    console.error("Upload error:", err);
+  }
+};
+
+
+
 
   return (
         <View>
-          <ButtonPickerFile id={id} folder={folder}/>
+          <Button
+              title="Import your files"
+              onPress={async () => {
+
+                setIsLoading(true)
+                await uploadFilesOnPressHandler()
+                
+                await fetchFileHandler()
+                setIsLoading(false)
+
+              }}
+              backgroundColor="#0099ff"
+            />
           {errorBackend ? <TextError>{errorBackend}</TextError> : null}
-          <FileList data={data} folder={folder}/>
-        
+          {isLoading ? (<Loading/>) : (<FileList data={data} folder={folder}/>)}
+
         </View>
   )
-
 }
 
 
 
-export default FolderScreen
+export default FolderScreen;

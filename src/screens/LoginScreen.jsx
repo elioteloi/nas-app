@@ -10,6 +10,7 @@ import Title from "../components/Title";
 import Input from "../components/Input"
 import TextError from "../components/TextError";
 import Button from "../components/Button"
+import Loading from "../components/Loading";
 
 const LoginScreen = () => {
 
@@ -19,6 +20,8 @@ const LoginScreen = () => {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  
   const [errorMessage, setErrorMessage] = useState('')
   const [errorBackend, setErrorBackend] = useState('')
 
@@ -31,6 +34,8 @@ const LoginScreen = () => {
     if (json.success) {
      
       login(json)
+      setIsLoading(true)
+
       console.log(json);
       
     } else if (json.errorInput) {
@@ -48,7 +53,9 @@ const LoginScreen = () => {
   
 
   return(
-    <AuthContainer>
+      <>{isLoading ? (<Loading/>) : (
+        <>
+<AuthContainer>
 
       <Title title="Login"/>
       
@@ -68,11 +75,17 @@ const LoginScreen = () => {
         secureTextEntry={true}
       />
       
-      <Button title="Login" onPress={Login} backgroundColor="#0099ff"/>
+      <Button title="Login" onPress={
+        async () => {
+          await Login();
+          setIsLoading(false)
+        }} backgroundColor="#0099ff"/>
 
       <Button title="Go to signin" onPress={() => navigation.navigate("signin")} backgroundColor="#0099ff"/>
 
     </AuthContainer>
+        </>)}</>
+    
   )
 }
 

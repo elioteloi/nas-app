@@ -1,27 +1,25 @@
-import React from "react";
+import React, { useContext, useState } from "react";
+
 import folderApi from "../api/folderApi";
 import { FlatList, View } from "react-native";
 import Folder from "./Folder";
-import ButtonModalInput from "./ButtonModalInput";
 import ButtonModal from "./ButtonModal";
 import ButtonContainer from "./ButtonContainer";
+import AuthContext from "../context/AuthContext";
+import Loading from "./Loading";
+import Input from "./Input";
 
-const FolderList = ({data}) => {
+const FolderList = () => {
+  const {updateFolder, deleteFolder } = folderApi()
+  const [isLoading, setIsLoading] = useState(false)
+  const [changeText, setChangeText] = useState('')
 
-  const { updateFolder, deleteFolder } = folderApi()
+  const { data, fetchFolderHandler} = useContext(AuthContext)
 
 
-  const handleUpdate = (changeId, changeText) => {
-    updateFolder(changeId, changeText)
-    console.log("update", changeId, changeText);
-    
-  }
-
-  const handleDelete = (id) => {
-    deleteFolder(id)
-  }
     return (
       <>
+      {isLoading ? (<Loading/>) : (
 
       <FlatList 
         data={data}
@@ -33,13 +31,38 @@ const FolderList = ({data}) => {
           <Folder item={item}/>
 
           <ButtonContainer>
-            <ButtonModalInput title="Update" placeholder="change the name for the folder" titleBtnModal="update" id={item.id} triggerFunction={handleUpdate}/>
-            <ButtonModal title="Delete" textAlert="Are you sure that you want to delete the folder !" titleBtnModal="Delete folder" id={item.id} triggerFunction={handleDelete}/>
+            <ButtonModal title="Update" titleBtnModal="Update folder" 
+              onPress={ async () => {
+                setIsLoading(true)
+                await updateFolder(item.id, changeText)
+                
+                await fetchFolderHandler();
+                setIsLoading(false)
+                
+                }}
+            >
+              <Input placeholder="change the name for the folder" onChangeText={setChangeText} value={changeText} />
+            </ButtonModal>
+
+            <ButtonModal title="Delete" textAlert="Are you sure that you want to delete the folder !" titleBtnModal="Delete folder" 
+              onPress={ async () => {
+                setIsLoading(true)
+                await deleteFolder(item.id)
+                
+              
+                await fetchFolderHandler();
+                setIsLoading(false)
+               
+                
+              }}
+            />
           </ButtonContainer>
           </View>
         )}
-      />
+      /> 
+      )}
       </>
+
 
     )
 }
