@@ -5,8 +5,6 @@ import { StyleSheet, Image, View } from 'react-native';
 const FileScreen = ({ route }) => {
 
     const {userdrive, folder, filename} = route.params
-
-    console.log("File Screen", filename);
     
     return (
         <View>

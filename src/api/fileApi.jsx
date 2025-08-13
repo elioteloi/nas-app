@@ -36,7 +36,6 @@ const fetchFile = async (id, folder) => {
 
 
   const updateFile = async (id, name) => {
-    console.log("update", id, name);
     
     try {
       const response = await fetch(`http://${Config.API_IP_ADDRESS}:3000/updateFile`, {

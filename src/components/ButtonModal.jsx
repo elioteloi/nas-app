@@ -3,7 +3,7 @@ import ModalComponent from "./Modal";
 import { Text, View } from "react-native";
 import Button from "./Button";
 
-const ButtonModal = ({title, titleBtnModal, textAlert, id, triggerFunction}) => {
+const ButtonModal = ({children, title, titleBtnModal, textAlert, onPress}) => {
 
     const [modalFolderVisible, setModalFolderVisible] = useState(false)
     
@@ -14,10 +14,11 @@ const ButtonModal = ({title, titleBtnModal, textAlert, id, triggerFunction}) => 
                 onRequestClose={() => {
                     setModalFolderVisible(!modalFolderVisible);
                 }}>
+                    <View>{children}</View>
                 <Text style={{ color: 'black'}}>{textAlert}</Text>
                 <View>
-                    <Button title={titleBtnModal} onPress={()=> {
-                        triggerFunction(id)
+                    <Button title={titleBtnModal} onPress={async ()=> {
+                        onPress();
                         setModalFolderVisible(!modalFolderVisible)                
                         }} backgroundColor="#0099ff"/>
                     <Button title="close" onPress={() => setModalFolderVisible(!modalFolderVisible)} backgroundColor="#CD5C5C"/>
@@ -31,4 +32,3 @@ const ButtonModal = ({title, titleBtnModal, textAlert, id, triggerFunction}) => 
 }
 
 export default ButtonModal
-

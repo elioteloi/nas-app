@@ -60,7 +60,6 @@ const userApi = () => {
 }
 
 const deleteUser = async (id) => {
-  console.log("id delete", id);
   
   try {
   const response = await fetch(`http:/${Config.API_IP_ADDRESS}:3000/deleteUser/${id}`, {
