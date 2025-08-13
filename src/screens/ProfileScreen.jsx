@@ -29,7 +29,9 @@ const { updateUser, deleteUser } = userApi()
             <View style={styles.bottomContainer}>
 
 
-                  <ButtonModal title="logged out" textAlert="Are you sure that you want to logout ?" titleBtnModal="logged out" triggerFunction={logout}/>
+                  <ButtonModal title="logged out" textAlert="Are you sure that you want to logout ?" titleBtnModal="logged out" onPress={async () => {
+                    await logout()
+                  }}/>
                   <ButtonModal title="Delete acccount" textAlert="Are you sure that you want to delete the account" titleBtnModal="Delete account" id={id} triggerFunction={handleDelete}/>
               
             </View>
