@@ -1,17 +1,20 @@
 import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ActivityIndicator, View } from 'react-native';
+import folderApi from '../api/folderApi';
 
-// Create AuthContext
 const AuthContext = createContext(); 
 
-// Create AuthProvider as a functional component
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [id, setId] = useState()
   const [name, setName] = useState()
   const [email, setEmail] = useState()
-  
+  const [data, setData] = useState([])
+  const [noWifi, setNoWifi] = useState(true)
+    
+  const { fetchFolder } = folderApi()
+
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
@@ -46,7 +49,6 @@ export const AuthProvider = ({ children }) => {
         email: value.email
       };
   
-      // Store the user object in AsyncStorage
      let storage = JSON.stringify(user)
       await AsyncStorage.setItem('storage', storage);
       
@@ -67,11 +69,35 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+   const fetchFolderHandler = async () => {
+    try {
+
+      const values = await AsyncStorage.getItem('storage')
+      
+      if (!values) {
+        console.error('No data found in storage');
+        return;
+      }
+      
+      const users = JSON.parse(values);
+
+      const json = await fetchFolder(users.id);
+      setNoWifi(false)
+      setData(json.result);          
+      console.log("json home", json);
+
+    } catch (error) {
+      console.error('Error in fetchFolderHandler', error);
+    }
+    
+
+  }
+
 
   
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, id, name, email, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, id, name, email, logout, fetchFolderHandler, data, noWifi }}>
       {children}
     </AuthContext.Provider>
   );

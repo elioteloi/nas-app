@@ -82,7 +82,7 @@ const AppTab = () => {
         tabBarIcon: ({size, focused, color}) => {
           return (
             <Image
-            style={{ width: size, height: size,           tintColor: focused ? '#0099ff' : 'gray',}}
+            style={{ width: size, height: size, tintColor: focused ? '#0099ff' : 'gray',}}
             source={require('../../assets/images/user.png')}
             />
           )
