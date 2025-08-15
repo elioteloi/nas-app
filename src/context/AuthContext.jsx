@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ActivityIndicator, View } from 'react-native';
 import folderApi from '../api/folderApi';
+import userApi from '../api/userApi';
 
 const AuthContext = createContext(); 
 
@@ -14,6 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [noWifi, setNoWifi] = useState(true)
     
   const { fetchFolder } = folderApi()
+  const { deleteUser } = userApi()
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -69,6 +71,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const deleteAccount = async (id) => {
+    try {
+      await deleteUser(id)
+      setIsLoggedIn(false);
+      await AsyncStorage.removeItem('storage');
+    } catch (error) {
+      console.error('Failed to remove item from AsyncStorage:', error);
+    }
+  };
+
    const fetchFolderHandler = async () => {
     try {
 
@@ -97,7 +109,7 @@ export const AuthProvider = ({ children }) => {
   
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, id, name, email, logout, fetchFolderHandler, data, noWifi }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, id, name, email, logout, deleteAccount, fetchFolderHandler, data, noWifi }}>
       {children}
     </AuthContext.Provider>
   );
