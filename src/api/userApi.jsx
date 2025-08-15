@@ -2,9 +2,9 @@ import Config from "react-native-config";
 
 const userApi = () => {
 
-  const createUser = async (name, email, password) => {
+  const createUser = async (name, email, password) => { 
     try {
-    const response = await fetch(`http://${Config.API_IP_ADDRESS}:3000/createUser`, {
+    const response = await fetch(`http://${Config.API_IP_ADDRESS}:${Config.PORT}/createUser`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -23,7 +23,7 @@ const userApi = () => {
 
   const fetchUser = async (email, password) => {
     try {
-    const response = await fetch(`http://${Config.API_IP_ADDRESS}:3000/fetchUser`, {
+    const response = await fetch(`http://${Config.API_IP_ADDRESS}:${Config.PORT}/fetchUser`, {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
@@ -40,7 +40,7 @@ const userApi = () => {
 
   const updateUser = async (id, password, newPassword) => {
     try {
-    const response = await fetch(`http://${Config.API_IP_ADDRESS}:3000/updateUser`, {
+    const response = await fetch(`http://${Config.API_IP_ADDRESS}:${Config.PORT}/updateUser`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ const userApi = () => {
 const deleteUser = async (id) => {
   
   try {
-  const response = await fetch(`http:/${Config.API_IP_ADDRESS}:3000/deleteUser/${id}`, {
+  const response = await fetch(`http:/${Config.API_IP_ADDRESS}:${Config.PORT}/deleteUser/${id}`, {
     method: "DELETE",
     headers: {
       'Content-Type': 'application/json',

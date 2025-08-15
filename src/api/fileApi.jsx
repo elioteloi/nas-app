@@ -4,7 +4,7 @@ const fileApi = () => {
 
     const createFile = async (file) => {
       try {
-        const response = await fetch(`http://${Config.API_IP_ADDRESS}:3000/createFile`, {
+        const response = await fetch(`http://${Config.API_IP_ADDRESS}:${Config.PORT}/createFile`, {
             method: 'POST',
            
             body: file
@@ -19,7 +19,7 @@ const fileApi = () => {
 
 const fetchFile = async (id, folder) => {
   try {
-    const response = await fetch(`http://${Config.API_IP_ADDRESS}:3000/fetchFile`, {
+    const response = await fetch(`http://${Config.API_IP_ADDRESS}:${Config.PORT}/fetchFile`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ const fetchFile = async (id, folder) => {
   const updateFile = async (id, name) => {
     
     try {
-      const response = await fetch(`http://${Config.API_IP_ADDRESS}:3000/updateFile`, {
+      const response = await fetch(`http://${Config.API_IP_ADDRESS}:${Config.PORT}/updateFile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +59,7 @@ const fetchFile = async (id, folder) => {
   const deleteFile = async (id) => {
     try {
       
-      const response = await fetch(`http://${Config.API_IP_ADDRESS}:3000/deleteFile/${id}`, {
+      const response = await fetch(`http://${Config.API_IP_ADDRESS}:${Config.PORT}/deleteFile/${id}`, {
         method: "DELETE",
           headers: {
             "Content-Type": "application/json",
