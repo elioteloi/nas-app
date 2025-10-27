@@ -96,7 +96,6 @@ export const AuthProvider = ({ children }) => {
       const json = await fetchFolder(users.id);
       setNoWifi(false)
       setData(json.result);          
-      console.log("json home", json);
 
     } catch (error) {
       console.error('Error in fetchFolderHandler', error);

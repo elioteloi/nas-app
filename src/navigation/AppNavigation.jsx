@@ -8,6 +8,7 @@ import SigninScreen from '../screens/SigninScreen';
 import AuthContext, { AuthProvider } from '../context/AuthContext';
 import FolderScreen from '../screens/FolderScreen';
 import FileScreen from '../screens/FileScreen';
+import PictureScreen from '../screens/PictureScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { Image } from 'react-native';
 
@@ -72,6 +73,18 @@ const AppTab = () => {
             <Image
             style={{ width: size, height: size, tintColor: focused ? '#0099ff' : 'gray',}}
             source={require('../../assets/images/folder.png')}
+            />
+          )
+        }
+      }}/>
+      <Tab.Screen name='Pictures' component={PictureScreen}
+      options={{
+        headerShown: false,
+        tabBarIcon: ({size, focused, color}) => {
+          return (
+            <Image
+            style={{ width: size, height: size, tintColor: focused ? '#0099ff' : 'gray',}}
+            source={require('../../assets/images/photo.png')}
             />
           )
         }
