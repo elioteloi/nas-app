@@ -31,12 +31,9 @@ const LoginScreen = () => {
   
     const json = await fetchUser(email, password);
       
-    if (json.success) {
-     
+    if (json.success) {     
       login(json)
       setIsLoading(true)
-
-      console.log(json);
       
     } else if (json.errorInput) {
       console.log(json.errorInput);

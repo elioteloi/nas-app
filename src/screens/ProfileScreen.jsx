@@ -44,7 +44,7 @@ const { updateUser } = userApi()
                     await logout()
                   }}/>
                   <ButtonModal title="Delete acccount" textAlert="Are you sure that you want to delete the account" titleBtnModal="Delete account" onPress={async () => {
-                    await deleteAccount(id)
+                    await deleteAccount(id)                    
                   }} />
               
             </View>
