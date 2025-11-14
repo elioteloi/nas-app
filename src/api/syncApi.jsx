@@ -2,12 +2,12 @@ import React from "react";
 import Config from "react-native-config";
 
 const syncApi = () => {
-        const createSync = async (file) => {
+        const createSync = async (formData) => {
           try {
             const response = await fetch(`http://${Config.API_IP_ADDRESS}:${Config.PORT}/sync`, {
                 method: 'POST',
                
-                body: file
+                body: formData
               })
                   
             let data = await response.json();

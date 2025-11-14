@@ -5,12 +5,13 @@ import syncApi from "../api/syncApi";
 import AuthContext from "../context/AuthContext";
 import Config from "react-native-config";
 
+
 const PictureScreen = () => {
 
   const { id, name } = useContext(AuthContext)
 
 
-  const { fetchSync } = syncApi()
+  const { createSync, fetchSync } = syncApi()
 
   const [photos, setPhotos] = useState([]);
   const [isEnabled, setIsEnabled] = useState(true)
@@ -18,71 +19,60 @@ const PictureScreen = () => {
 
 
   useEffect(() => {
-    let ws
-
     async function fetchFileFunc() {
+
       // const path = RNFS.ExternalStorageDirectoryPath + "/DCIM/Screenshots";
 
     const path = RNFS.ExternalStorageDirectoryPath + "/Test";
+        // const path = RNFS.ExternalStorageDirectoryPath + "/DCIM/Camera";
+
     const files = await RNFS.readDir(path);
     
     let data = await fetchSync(id);
+    
       setPhotos(data.result);      
       
-      const ws = new WebSocket(`ws://100.91.102.83:8080`);
-      console.log("Websocket connection opened");
-      
-      ws.onopen = async () => {
         for (let index = 0; index < files.length; index++) {
-      itsThere = false;
-      for (let j = 0; j < photos.length; j++) {
-        
-        if (data.result[j].name === files[index].name) {
-          console.log("name ", data.result[index].name);
-          itsThere = true;
-          break;
-        }
-      }
-      if (itsThere) {
-        console.log("match");
-      } else {
-        try {
-          const base64Data = await RNFS.readFile(files[index].path, 'base64');          
+          itsThere = false;
+          for (let j = 0; j < data.result.length; j++) {
+              
+            if (data.result[j].filename === files[index].name) {
+              console.log("name ", data.result[j].filename);
+              itsThere = true;
+              break;
+            }
+          }
+          if (itsThere) {
+            console.log("match");
+          } else {
+            console.log("no match");
 
-          ws.send(
-            JSON.stringify({
-              id: id,
-              name: name,
-              type: "file",
-              filename: files[index].name,
-              data: base64Data,
-            })
-          );
-        } catch (error) {
-          console.error('Error reading fileyee:', error);
-        }
-      }
-    }
-    ws.onmessage = (e) => {
-      console.log("message from server: ", e.data);
-    };
+            try {
+                
+                const formData = new FormData();
+              formData.append("sync", {
+                uri: 'file://' + files[index].path,
+                type: "image/png",
+                name:files[index].name,
+              });
+              formData.append("ID", id);
+              formData.append("NAME", name)
 
-    ws.onerror = (e) => {
-      console.log("websocket error: ", e.message);
-    };
-
-    ws.onclose = (e) => {
-      console.log("Websocket econnection closed: ", e.code, e.reason);
-    };
+              try {
+                const response = await createSync(formData);
+                console.log("Message from backend:", response.message);
+              } catch (error) {
+                console.error("Upload failed:", error);
+              }      
+                  
+            } catch (error) {
+              console.error('Error reading file:', error);
+            }
+          }
   }
     }
 
     fetchFileFunc()
-
-    return () => {
-      ws.close();
-    };
-
   }, [])
 
 
