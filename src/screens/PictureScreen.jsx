@@ -6,10 +6,14 @@ import syncApi from "../api/syncApi";
 import AuthContext from "../context/AuthContext";
 import Config from "react-native-config";
 
+import { NativeModules, PermissionsAndroid } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const { MediaStoreModule } = NativeModules;
 
 const PictureScreen = () => {
 
-  const { id, name } = useContext(AuthContext)
+  const { id, name, folderSync, folder} = useContext(AuthContext)
 
 
   const { createSync, fetchOriginalFiles, fetchResizedFiles } = syncApi()
@@ -18,68 +22,77 @@ const PictureScreen = () => {
   const [resizedFiles,  setResizedFiles] = useState([]);
   const [isEnabled, setIsEnabled] = useState(true)
 
-
-
-  useEffect(() => {
     async function fetchFileFunc() {
+      const values = await AsyncStorage.getItem('folderSync')
+      const sync = JSON.parse(values);
 
-      // const path = RNFS.ExternalStorageDirectoryPath + "/DCIM/Screenshots";
+      console.log("asyncStorage ", sync);
 
-    const path = RNFS.ExternalStorageDirectoryPath + "/Download/video";
-        // const path = RNFS.ExternalStorageDirectoryPath + "/DCIM/Camera";
+      for (let index = 0; index < sync.length; index++) {
+        if (sync[index].boolean === true) {
+          console.log("sync: ", sync[index].name);
 
-    const files = await RNFS.readDir(path);
-    let dataResizedFile = await fetchResizedFiles(id)
-    let dataOriginalFiles = await fetchOriginalFiles(id);
-    console.log("imagess ", files);
-    
-      setResizedFiles(dataResizedFile.result)
-      setOriginalFiles(dataOriginalFiles.result);      
+      const files = await MediaStoreModule.getImagesByFolder(sync[index].id);
+
+      console.log("path", files);
       
-        for (let index = 0; index < files.length; index++) {
-          itsThere = false;
-          const mimeType = mime.lookup(files[index].name.toLowerCase());
+      let dataResizedFile = await fetchResizedFiles(id)
+      let dataOriginalFiles = await fetchOriginalFiles(id);
+      
+      
+        setResizedFiles(dataResizedFile.result)
+        setOriginalFiles(dataOriginalFiles.result);      
+        
+          for (let index = 0; index < files.length; index++) {
+            itsThere = false;
+            const mimeType = mime.lookup(files[index].name.toLowerCase());
 
-          
-          for (let j = 0; j < dataOriginalFiles.result.length; j++) {
-            if (dataOriginalFiles.result[j].filename === files[index].name) {
-              itsThere = true;
-              break;
+            
+            for (let j = 0; j < dataOriginalFiles.result.length; j++) {
+              if (dataOriginalFiles.result[j].filename === files[index].name) {
+                itsThere = true;
+                break;
+              }
             }
-          }
-          if (itsThere) {
-                        console.log("match ", files[index].path, mimeType);
+            if (itsThere) {
+              console.log("match ", files[index].name, mimeType);
 
-          } else {
-            console.log("no match ", files[index].name, mimeType );
-            try {
+            } else {
+              console.log("no match ", files[index].name, files[index].mimeType, files[index].uri );
+              try {
 
                 const formData = new FormData();
-              formData.append("sync", {
-                uri: 'file://' + files[index].path,
-                type: mimeType,
-                name:files[index].name,
-              });
-              formData.append("ID", id);
-              formData.append("NAME", name)
+                formData.append("sync", {
+                  uri: files[index].uri,
+                  type: files[index].mimeType,
+                  name:files[index].name,
+                });
+                formData.append("ID", id);
+                formData.append("NAME", name)
 
-              try {
-                const response = await createSync(formData);
-                console.log("Message from backend:", response);
+                try {
+                  const response = await createSync(formData);
+                  console.log("Message from backend:", response);
+                } catch (error) {
+                  console.error("Upload failed:", error);
+                }      
+                    
               } catch (error) {
-                console.error("Upload failed:", error);
-              }      
-                  
-            } catch (error) {
-              console.error('Error reading file:', error);
-            }          
+                console.error('Error reading file:', error);
+              }          
+            }
           }
-  }
-    }
+        }
+        
+        
+  } 
+    
+  };
 
+  useEffect(() => {   
+    
     fetchFileFunc()
   }, [])
-
 
   return (
     <View>
@@ -96,9 +109,7 @@ const PictureScreen = () => {
 
           />
         </View>)}
-
-      />
-
+      />   
     </View>
   );
 };
