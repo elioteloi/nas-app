@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { useState } from "react";
 import { useNavigation } from '@react-navigation/native';
 
@@ -9,9 +9,16 @@ import Input from "../components/Input";
 import Title from "../components/Title";
 import TextError from "../components/TextError";
 import AuthContainer from "../components/AuthContainer";
+import { PermissionsAndroid, NativeModules } from "react-native";
+import AuthContext from "../context/AuthContext";
+
+const { MediaStoreModule } = NativeModules;
+
+
 
 const SigninScreen = () => {
   
+  const { folderSync } = useContext(AuthContext)
   const navigation = useNavigation();
 
   const [name, setName] = useState('')
@@ -21,6 +28,46 @@ const SigninScreen = () => {
   const [errorBackend, setErrorBackend] = useState('')
 
   const {createUser} = userApi()
+
+        const requestPermissionAndLogFiles = async () => {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
+        );
+
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('Storage permission denied');
+          return;
+        }
+  
+        console.log('Storage permission granted');
+      
+          const folders = await MediaStoreModule.getImageFolders();
+  
+          let asyncArray = []
+  
+          for (let index = 0; index < folders.length; index++) {
+                const syncObj = {
+                  id: folders[index].id,
+                  name: folders[index].name,
+                  boolean: true,
+                  lastImage: folders[index].lastImage
+                };
+                asyncArray.push(syncObj)
+          }
+          folderSync(asyncArray)
+
+          console.log("folder synced");
+          
+    } catch (err) {
+        console.warn(err);
+      }
+  
+  }
+
+  useEffect(() => {
+    requestPermissionAndLogFiles()
+  })
 
   const Signin = async () => {
 
