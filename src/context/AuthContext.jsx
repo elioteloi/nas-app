@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   const [email, setEmail] = useState()
   const [data, setData] = useState([])
   const [noWifi, setNoWifi] = useState(true)
-    
+  const [ folder, setFolder ] = useState()
   const { fetchFolder } = folderApi()
   const { deleteUser } = userApi()
 
@@ -62,6 +62,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const folderSync = async (value) => {
+
+    try {
+
+      let storage = JSON.stringify(value)
+      await AsyncStorage.setItem('folderSync', storage);
+    
+  } catch (e) {
+    console.error("error storing sync folder: ", e);
+    
+  }
+    // let values = JSON.stringify(value)
+    // await AsyncStorage.setItem('folderSync: ', false);  
+    // setFolder(false)  
+    // // console.log("folder sync: ", value);
+    
+
+  }
+
   const logout = async () => {
     try {
       setIsLoggedIn(false);
@@ -108,7 +127,7 @@ export const AuthProvider = ({ children }) => {
   
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, id, name, email, logout, deleteAccount, fetchFolderHandler, data, noWifi }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, id, name, email, logout, deleteAccount, fetchFolderHandler, folderSync, data, noWifi, folder }}>
       {children}
     </AuthContext.Provider>
   );
