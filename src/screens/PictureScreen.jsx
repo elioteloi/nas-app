@@ -13,7 +13,7 @@ const { MediaStoreModule } = NativeModules;
 
 const PictureScreen = () => {
 
-  const { id, name, folderSync, folder} = useContext(AuthContext)
+  const { id, name } = useContext(AuthContext)
 
 
   const { createSync, fetchOriginalFiles, fetchResizedFiles } = syncApi()
@@ -30,7 +30,7 @@ const PictureScreen = () => {
 
       for (let index = 0; index < sync.length; index++) {
         if (sync[index].boolean === true) {
-          console.log("sync: ", sync[index].name);
+          let folder = sync[index].name
 
       const files = await MediaStoreModule.getImagesByFolder(sync[index].id);
 
@@ -56,9 +56,10 @@ const PictureScreen = () => {
             }
             if (itsThere) {
               console.log("match ", files[index].name, mimeType);
-
+              
             } else {
               console.log("no match ", files[index].name, files[index].mimeType, files[index].uri );
+
               try {
 
                 const formData = new FormData();
@@ -69,6 +70,7 @@ const PictureScreen = () => {
                 });
                 formData.append("ID", id);
                 formData.append("NAME", name)
+                formData.append("FOLDER", folder)
 
                 try {
                   const response = await createSync(formData);
