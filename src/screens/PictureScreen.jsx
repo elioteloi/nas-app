@@ -1,4 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
+import Button from "../components/Button";
+
 import { View, Image, ScrollView, Platform, Alert, Linking, Text, FlatList, Switch } from "react-native";
 import RNFS from 'react-native-fs';
 import mime from 'react-native-mime-types';
@@ -20,28 +22,26 @@ const PictureScreen = () => {
 
   const [originalFiles, setOriginalFiles] = useState([]);
   const [resizedFiles,  setResizedFiles] = useState([]);
-  const [isEnabled, setIsEnabled] = useState(true)
+  const [asyncStorage, setAsyncStorage] = useState()
 
     async function fetchFileFunc() {
+
+      let dataResizedFile = await fetchResizedFiles(id)
+      let dataOriginalFiles = await fetchOriginalFiles(id);
+
+        setResizedFiles(dataResizedFile.result)
+        setOriginalFiles(dataOriginalFiles.result);  
+      
       const values = await AsyncStorage.getItem('folderSync')
       const sync = JSON.parse(values);
 
-      console.log("asyncStorage ", sync);
+      setAsyncStorage(sync)
 
       for (let index = 0; index < sync.length; index++) {
         if (sync[index].boolean === true) {
           let folder = sync[index].name
 
-      const files = await MediaStoreModule.getImagesByFolder(sync[index].id);
-
-      console.log("path", files);
-      
-      let dataResizedFile = await fetchResizedFiles(id)
-      let dataOriginalFiles = await fetchOriginalFiles(id);
-      
-      
-        setResizedFiles(dataResizedFile.result)
-        setOriginalFiles(dataOriginalFiles.result);      
+      const files = await MediaStoreModule.getImagesByFolder(sync[index].id);      
         
           for (let index = 0; index < files.length; index++) {
             itsThere = false;
@@ -90,6 +90,24 @@ const PictureScreen = () => {
   } 
     
   };
+  
+  
+  async function filterEle(folderName) {    
+
+    if (folderName == "All") {
+      let dataResizedFile = await fetchResizedFiles(id)
+    
+      setResizedFiles(dataResizedFile.result)
+      
+    } else {
+      let dataResizedFile = await fetchResizedFiles(id)
+    
+    setResizedFiles(dataResizedFile.result)
+    
+    setResizedFiles(dataResizedFile.result.filter((el) => el.folderSync === folderName))
+    }
+
+  }
 
   useEffect(() => {   
     
@@ -98,6 +116,36 @@ const PictureScreen = () => {
 
   return (
     <View>
+       <Button
+      backgroundColor="#0099ff"
+      title="All"
+     
+      onPress={() => {filterEle("All")}
+      }
+    >
+      <Text style={{ color: "white" }}>
+        {"All"}
+      </Text>
+    </Button>
+<FlatList 
+  data={asyncStorage}
+  keyExtractor={item => item.id}
+  numColumns={5}
+  columnWrapperStyle={{ justifyContent: "space-between" }}
+  renderItem={({ item }) => (
+    <Button
+    backgroundColor="#0099ff"
+    title={item.name}
+     
+      onPress={() => {filterEle(item.name)}
+      }
+    >
+      <Text style={{ color: "white" }}>
+        {item.name}
+      </Text>
+    </Button>
+  )}
+/>
       <FlatList
         data={resizedFiles}
         keyExtractor={item => item.id}
