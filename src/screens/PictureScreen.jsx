@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import Button from "../components/Button";
 
-import { View, Image, ScrollView, Platform, Alert, Linking, Text, FlatList, Switch } from "react-native";
+import { View, Image, Text, FlatList, ScrollView } from "react-native";
 import RNFS from 'react-native-fs';
 import mime from 'react-native-mime-types';
 import syncApi from "../api/syncApi";
@@ -34,6 +34,7 @@ const PictureScreen = () => {
       
       const values = await AsyncStorage.getItem('folderSync')
       const sync = JSON.parse(values);
+      
 
       setAsyncStorage(sync)
 
@@ -127,11 +128,12 @@ const PictureScreen = () => {
         {"All"}
       </Text>
     </Button>
+<ScrollView>
 <FlatList 
   data={asyncStorage}
   keyExtractor={item => item.id}
-  numColumns={5}
-  columnWrapperStyle={{ justifyContent: "space-between" }}
+  numColumns={1}
+  horizontal={true} 
   renderItem={({ item }) => (
     <Button
     backgroundColor="#0099ff"
@@ -146,6 +148,7 @@ const PictureScreen = () => {
     </Button>
   )}
 />
+</ScrollView>
       <FlatList
         data={resizedFiles}
         keyExtractor={item => item.id}
