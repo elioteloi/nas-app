@@ -1,4 +1,4 @@
-﻿﻿# NAS App
+# NAS App
 
 A Front-End for a NAS (Network-attached storage) created in React-Native with react-native-document-picker and react-native-async-storage
 
@@ -37,7 +37,7 @@ cd nas-app
 ```bash
 npm install
 ```
-
+npm 
 ### 3. Create a .env file to connect to your backend server
 
 ```bash
