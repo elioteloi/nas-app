@@ -1,32 +1,40 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, {createContext, useState, useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ActivityIndicator, View } from 'react-native';
+import {ActivityIndicator, View} from 'react-native';
 import folderApi from '../api/folderApi';
 import userApi from '../api/userApi';
 
-const AuthContext = createContext(); 
+const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({children}) => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [id, setId] = useState()
-  const [name, setName] = useState()
-  const [email, setEmail] = useState()
-  const [data, setData] = useState([])
-  const [noWifi, setNoWifi] = useState(true)
-  const [ folder, setFolder ] = useState()
-  const { fetchFolder } = folderApi()
-  const { deleteUser } = userApi()
+  const [url, setUrl] = useState();
+  const [id, setId] = useState();
+  const [name, setName] = useState();
+  const [email, setEmail] = useState();
+  const [data, setData] = useState([]);
+  const [noWifi, setNoWifi] = useState(true);
+  const [folder, setFolder] = useState();
+
+  // const {fetchFolder} = folderApi();
+  // const {deleteUser} = userApi();
 
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
+        const valueUrl = await AsyncStorage.getItem('url');
+        if (valueUrl) {
+          const data = JSON.parse(valueUrl);
+          setUrl(data);
+        } else {
+          setIsLoggedIn(false);
+        }
         const value = await AsyncStorage.getItem('storage');
         if (value) {
-          
           const data = JSON.parse(value);
-          setId(data.id)
-          setName(data.name)
-          setEmail(data.email)
+          setId(data.id);
+          setName(data.name);
+          setEmail(data.email);
           setIsLoggedIn(data.boolean);
         } else {
           setIsLoggedIn(false);
@@ -35,51 +43,53 @@ export const AuthProvider = ({ children }) => {
         console.error('Error reading value', e);
         setIsLoggedIn(false);
       }
-    };  
+    };
 
     checkLoginStatus();
   }, []);
 
-  const login = async (value) => {    
-
+  const serverUrl = async url => {
     try {
-      
+      setUrl(url);
+      console.log('url context', url);
+
+      let urlStorage = JSON.stringify(url);
+      await AsyncStorage.setItem('url', urlStorage);
+    } catch (error) {
+      console.log('Failed to store serverl url', error);
+    }
+  };
+
+  const login = async value => {
+    try {
       const user = {
         boolean: true,
         id: value.id,
         name: value.name,
-        email: value.email
+        email: value.email,
       };
-  
-     let storage = JSON.stringify(user)
+
+      let storage = JSON.stringify(user);
       await AsyncStorage.setItem('storage', storage);
-      
-      setIsLoggedIn(true);  
 
-
+      setIsLoggedIn(true);
     } catch (error) {
-      console.log("Failed to store login state", error);
+      console.log('Failed to store login state', error);
     }
   };
 
-  const folderSync = async (value) => {
-
+  const folderSync = async value => {
     try {
-
-      let storage = JSON.stringify(value)
+      let storage = JSON.stringify(value);
       await AsyncStorage.setItem('folderSync', storage);
-    
-  } catch (e) {
-    console.error("error storing sync folder: ", e);
-    
-  }
+    } catch (e) {
+      console.error('error storing sync folder: ', e);
+    }
     // let values = JSON.stringify(value)
-    // await AsyncStorage.setItem('folderSync: ', false);  
-    // setFolder(false)  
+    // await AsyncStorage.setItem('folderSync: ', false);
+    // setFolder(false)
     // // console.log("folder sync: ", value);
-    
-
-  }
+  };
 
   const logout = async () => {
     try {
@@ -90,9 +100,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const deleteAccount = async (id) => {
+  const deleteAccount = async id => {
     try {
-      await deleteUser(id)
+      await deleteUser(id);
       setIsLoggedIn(false);
       await AsyncStorage.removeItem('storage');
     } catch (error) {
@@ -100,34 +110,23 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-   const fetchFolderHandler = async () => {
-    try {
-
-      const values = await AsyncStorage.getItem('storage')
-      
-      if (!values) {
-        console.error('No data found in storage');
-        return;
-      }
-      
-      const users = JSON.parse(values);
-
-      const json = await fetchFolder(users.id);
-      setNoWifi(false)
-      setData(json.result);          
-
-    } catch (error) {
-      console.error('Error in fetchFolderHandler', error);
-    }
-    
-
-  }
-
-
-  
-
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, id, name, email, logout, deleteAccount, fetchFolderHandler, folderSync, data, noWifi, folder }}>
+    <AuthContext.Provider
+      value={{
+        serverUrl,
+        isLoggedIn,
+        url,
+        login,
+        id,
+        name,
+        email,
+        logout,
+        deleteAccount,
+        folderSync,
+        data,
+        noWifi,
+        folder,
+      }}>
       {children}
     </AuthContext.Provider>
   );
