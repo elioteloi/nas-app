@@ -38,21 +38,21 @@ const HomeScreen = () => {
     <>
       <>
         <BottomSheet iconButtonBottomSheet={plus} iconBottomSheet={plus}>
-          <Input
-            onChangeText={setChangeText}
-            value={changeText}
-            placeholder="Type a name for the folder"
-          />
-          <Button
-            title="Create Folder"
+          <ButtonModal
+            title="Create folder"
+            titleBtnModal="name of the folder"
             onPress={async () => {
               setIsLoading(true);
               await createFolder(id, changeText);
               await folder(id);
               setIsLoading(false);
-            }}
-            backgroundColor="#0099ff"
-          />
+            }}>
+            <Input
+              placeholder="Give a name for the folder"
+              onChangeText={setChangeText}
+              value={changeText}
+            />
+          </ButtonModal>
         </BottomSheet>
         <FlatList
           data={data}
@@ -66,23 +66,38 @@ const HomeScreen = () => {
                 titleBottomSheet={item.foldername}
                 iconButtonBottomSheet={more}
                 iconBottomSheet={folderImage}
-                onPressUpdate={async () => {
-                  setIsLoading(true);
-                  await updateFolder(item.id, changeText);
-
-                  await folder(id);
-                  setIsLoading(false);
-                }}
-                onPressDelete={async () => {
-                  setIsLoading(true);
-                  await deleteFolder(item.id);
-
-                  await fetchFolder(item.id);
-                  setIsLoading(false);
-                }}
                 imageCard={folderImage}
-                titleCard={item.foldername}
-              />
+                titleCard={item.foldername}>
+                <ButtonModal
+                  title="Update"
+                  titleBtnModal="Update folder"
+                  onPress={async () => {
+                    setIsLoading(true);
+                    await updateFolder(item.id, changeText);
+
+                    await folder(id);
+                    setIsLoading(false);
+                  }}>
+                  <Input
+                    placeholder="Change the name for the folder"
+                    onChangeText={setChangeText}
+                    value={changeText}
+                  />
+                </ButtonModal>
+
+                <ButtonModal
+                  title="Delete"
+                  textAlert="Are you sure that you want to delete the folder !"
+                  titleBtnModal="Delete folder"
+                  onPress={async () => {
+                    setIsLoading(true);
+                    await deleteFolder(item.id);
+
+                    await folder(id);
+                    setIsLoading(false);
+                  }}
+                />
+              </Card>
             </View>
           )}
         />

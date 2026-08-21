@@ -15,15 +15,17 @@ const Card = ({
   titleBottomSheet,
   iconBottomSheet,
   onPressUpdate,
+  onChangeText,
+  value,
   onPressDelete,
-  imageCard,
   iconButtonBottomSheet,
+  children,
+  imageCard,
   titleCard,
 }) => {
   const navigation = useNavigation();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [changeText, setChangeText] = useState('');
 
   const {fetchFolder, updateFolder, deleteFolder} = folderApi();
 
@@ -39,23 +41,7 @@ const Card = ({
             title={titleBottomSheet}
             iconBottomSheet={imageCard}
             iconButtonBottomSheet={iconButtonBottomSheet}>
-            <ButtonModal
-              title="Update"
-              titleBtnModal="Update folder"
-              onPress={onPressUpdate}>
-              <Input
-                placeholder="Change the name for the folder"
-                onChangeText={setChangeText}
-                value={changeText}
-              />
-            </ButtonModal>
-
-            <ButtonModal
-              title="Delete"
-              textAlert="Are you sure that you want to delete the folder !"
-              titleBtnModal="Delete folder"
-              onPress={onPressDelete}
-            />
+            {children}
           </BottomSheet>
         </View>
 

@@ -40,7 +40,7 @@ const AppStack = () => {
               name="File"
               component={FileScreen}
               options={({route}) => ({
-                title: route.params?.params[2] || 'File',
+                title: route.params?.params[3] || 'File',
               })}
             />
           </>

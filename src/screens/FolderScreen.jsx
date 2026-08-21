@@ -7,6 +7,8 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import Loading from '../components/Loading';
 import Card from '../components/Card';
 import more from '../../assets/images/more.png';
+import ButtonModal from '../components/ButtonModal';
+import Input from '../components/Input';
 
 const FolderScreen = ({route}) => {
   const {id, url} = useContext(AuthContext);
@@ -14,6 +16,7 @@ const FolderScreen = ({route}) => {
   const [data, setData] = useState([]);
   const [errorBackend, setErrorBackend] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [changeText, setChangeText] = useState('');
 
   const {createFile, fetchFile, updateFile, deleteFile} = fileApi();
 
@@ -59,9 +62,9 @@ const FolderScreen = ({route}) => {
           name: element.fileName,
         });
         formData.append('ID', id);
-        formData.append('folder', folder);
-
+        formData.append('folder', params);
         await createFile(formData);
+        await file(id);
       }
     } catch (err) {
       console.error('Upload error:', err);
@@ -76,7 +79,6 @@ const FolderScreen = ({route}) => {
           setIsLoading(true);
           await uploadFilesOnPressHandler();
 
-          await fetchFile(id);
           setIsLoading(false);
         }}
         backgroundColor="#0099ff"
@@ -93,27 +95,47 @@ const FolderScreen = ({route}) => {
                 item.userdrive,
                 item.foldername,
                 item.filename,
+                item.originalname,
               ]}
-              titleBottomSheet={item.filename}
+              titleBottomSheet={item.originalname}
               iconButtonBottomSheet={more}
               iconBottomSheet={{
                 uri: `${url}/path_Of_Drive/${item.userdrive}/${item.foldername}/${item.filename}`,
               }}
-              onPressUpdate={async () => {
-                setIsLoading(true);
-                await updateFolder(item.id, changeText);
-                setIsLoading(false);
-              }}
-              onPressDelete={async () => {
-                setIsLoading(true);
-                await deleteFolder(item.id);
-                setIsLoading(false);
-              }}
+              onChangeText={setChangeText}
+              value={changeText}
               imageCard={{
                 uri: `${url}/path_Of_Drive/${item.userdrive}/${item.foldername}/${item.filename}`,
               }}
-              titleCard={item.filename}
-            />
+              titleCard={item.originalname}>
+              <ButtonModal
+                title="Update"
+                titleBtnModal="Update folder"
+                onPress={async () => {
+                  setIsLoading(true);
+                  await updateFile(item.id, changeText);
+                  await file(id);
+                  setIsLoading(false);
+                }}>
+                <Input
+                  placeholder="Change the name for the file"
+                  onChangeText={setChangeText}
+                  value={changeText}
+                />
+              </ButtonModal>
+
+              <ButtonModal
+                title="Delete"
+                textAlert="Are you sure that you want to delete the file !"
+                titleBtnModal="Delete file"
+                onPress={async () => {
+                  setIsLoading(true);
+                  await deleteFile(item.id);
+                  await file(id);
+                  setIsLoading(false);
+                }}
+              />
+            </Card>
           </View>
         )}
       />
